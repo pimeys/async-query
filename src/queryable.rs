@@ -1,33 +1,30 @@
 use super::DBIO;
 use futures::future;
+use async_std::sync::Mutex;
 
 pub trait Queryable {
-    fn select_1(&self) -> DBIO<u32>;
+    fn select_1(&self) -> DBIO<'_, u32>;
 }
 
 pub struct Sqlite {
-    client: rusqlite::Connection,
+    client: Mutex<rusqlite::Connection>,
 }
 
 impl Sqlite {
     pub fn new() -> crate::Result<Self> {
-        Ok(Self { client: rusqlite::Connection::open_in_memory()? })
+        Ok(Self { client: Mutex::new(rusqlite::Connection::open_in_memory()?) })
     }
 }
 
 impl Queryable for Sqlite {
-    fn select_1(&self) -> DBIO<u32> {
-        let sync = || {
-            let mut stmt = self.client.prepare_cached("SELECT 1")?;
+    fn select_1(&self) -> DBIO<'_, u32> {
+        DBIO::new(async move {
+            let client = self.client.lock().await;
+            let mut stmt = client.prepare_cached("SELECT 1")?;
             let mut rows = stmt.query(rusqlite::NO_PARAMS)?;
             let row = rows.next()?.unwrap();
 
             Ok(row.get(0)?)
-        };
-
-        match sync() {
-            Ok(num) => DBIO::new(future::ok(num)),
-            Err(e) => DBIO::new(future::err(e))
-        }
+        })
     }
 }

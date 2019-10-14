@@ -5,19 +5,19 @@ use std::{
     task::{Context, Poll},
 };
 
-pub struct DBIO<T>(BoxFuture<'static, crate::Result<T>>);
+pub struct DBIO<'a, T>(BoxFuture<'a, crate::Result<T>>);
 
-impl<T> DBIO<T>
+impl<'a, T> DBIO<'a, T>
 {
     pub fn new<F>(inner: F) -> Self
     where
-        F: Future<Output = crate::Result<T>> + Send + 'static,
+        F: Future<Output = crate::Result<T>> + Send + 'a,
     {
         Self(inner.boxed())
     }
 }
 
-impl<T> Future for DBIO<T>
+impl<'a, T> Future for DBIO<'a, T>
 {
     type Output = crate::Result<T>;
 
