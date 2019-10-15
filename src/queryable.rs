@@ -2,6 +2,8 @@ use super::DBIO;
 use futures::future::FutureExt;
 use async_std::sync::Mutex;
 use tokio_postgres::{NoTls, Config};
+use mysql_async::{self as my, prelude::Queryable as _};
+use failure::Fail;
 
 pub trait Queryable {
     fn select_1(&self) -> DBIO<u32>;
@@ -62,6 +64,42 @@ impl Queryable for Postgres {
             let result: i32 = row.get(0);
 
             Ok(result as u32)
+        })
+    }
+}
+
+pub struct Mysql {
+    pool: my::Pool,
+}
+
+impl Mysql {
+    pub fn new() -> crate::Result<Self> {
+        let mut opts = my::OptsBuilder::new();
+        opts.ip_or_hostname("localhost");
+        opts.pass(Some("prisma"));
+        opts.user(Some("root"));
+        opts.pool_constraints(my::PoolConstraints::new(1, 1));
+
+        Ok(Self {
+            pool: my::Pool::new(opts),
+        })
+    }
+}
+
+impl Queryable for Mysql {
+    fn select_1(&self) -> DBIO<u32> {
+        DBIO::new(async move {
+            let conn = self.pool.get_conn().await.map_err(|e| e.compat())?;
+
+            let (_, results) = conn
+                .prep_exec("SELECT 1", ())
+                .await
+                .map_err(|e| e.compat())?
+                .collect::<i32>()
+                .await
+                .map_err(|e| e.compat())?;
+
+            Ok(results[0] as u32)
         })
     }
 }
