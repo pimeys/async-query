@@ -15,3 +15,4 @@ tokio-postgres = { git = "https://github.com/sfackler/rust-postgres" }
 mysql_async = { git = "https://github.com/blackbeam/mysql_async" }
 async-lease = "0.1"
 failure = "0.1"
+tokio-resource-pool = { git = "https://github.com/pimeys/tokio-resource-pool" }

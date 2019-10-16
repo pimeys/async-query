@@ -1,9 +1,9 @@
 use super::DBIO;
-use futures::future::FutureExt;
 use async_std::sync::Mutex;
-use tokio_postgres::{NoTls, Config};
-use mysql_async::{self as my, prelude::Queryable as _};
 use failure::Fail;
+use futures::future::FutureExt;
+use mysql_async::{self as my, prelude::Queryable as _};
+use tokio_postgres::{Config, NoTls};
 
 pub trait Queryable {
     fn select_1(&self) -> DBIO<u32>;
@@ -14,8 +14,12 @@ pub struct Sqlite {
 }
 
 impl Sqlite {
-    pub fn new() -> crate::Result<Self> {
-        Ok(Self { client: Mutex::new(rusqlite::Connection::open_in_memory()?) })
+    pub fn new() -> DBIO<'static, Self> {
+        DBIO::new(async {
+            Ok(Self {
+                client: Mutex::new(rusqlite::Connection::open_in_memory()?),
+            })
+        })
     }
 }
 
@@ -33,23 +37,27 @@ impl Queryable for Sqlite {
 }
 
 pub struct Postgres {
-    client: Mutex<tokio_postgres::Client>
+    client: Mutex<tokio_postgres::Client>,
 }
 
 impl Postgres {
-    pub async fn new() -> crate::Result<Self> {
-        let (client, conn) = Config::new()
-            .user("postgres")
-            .password("prisma")
-            .host("localhost")
-            .connect(NoTls)
-            .await?;
+    pub fn new() -> DBIO<'static, Self> {
+        DBIO::new(async {
+            let (client, conn) = Config::new()
+                .user("postgres")
+                .password("prisma")
+                .host("localhost")
+                .connect(NoTls)
+                .await?;
 
-        let connection = conn.map(|r| r.unwrap());
+            let connection = conn.map(|r| r.unwrap());
 
-        tokio::spawn(connection);
+            tokio::spawn(connection);
 
-        Ok(Self { client: Mutex::new(client) })
+            Ok(Self {
+                client: Mutex::new(client),
+            })
+        })
     }
 }
 
@@ -73,15 +81,17 @@ pub struct Mysql {
 }
 
 impl Mysql {
-    pub fn new() -> crate::Result<Self> {
-        let mut opts = my::OptsBuilder::new();
-        opts.ip_or_hostname("localhost");
-        opts.pass(Some("prisma"));
-        opts.user(Some("root"));
-        opts.pool_constraints(my::PoolConstraints::new(1, 1));
+    pub fn new() -> DBIO<'static, Self> {
+        DBIO::new(async {
+            let mut opts = my::OptsBuilder::new();
+            opts.ip_or_hostname("localhost");
+            opts.pass(Some("prisma"));
+            opts.user(Some("root"));
+            opts.pool_constraints(my::PoolConstraints::new(1, 1));
 
-        Ok(Self {
-            pool: my::Pool::new(opts),
+            Ok(Self {
+                pool: my::Pool::new(opts),
+            })
         })
     }
 }

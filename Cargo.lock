@@ -46,6 +46,7 @@ dependencies = [
  "rusqlite 0.19.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tokio 0.2.0-alpha.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "tokio-postgres 0.4.0-rc.3 (git+https://github.com/sfackler/rust-postgres)",
+ "tokio-resource-pool 0.5.0-alpha.1 (git+https://github.com/pimeys/tokio-resource-pool)",
 ]
 
 [[package]]
@@ -1564,6 +1565,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "tokio-resource-pool"
+version = "0.5.0-alpha.1"
+source = "git+https://github.com/pimeys/tokio-resource-pool#cd5f68e2d3a88425e239918d1ed4a592ba451c41"
+dependencies = [
+ "crossbeam-queue 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "futures-preview 0.3.0-alpha.19 (registry+https://github.com/rust-lang/crates.io-index)",
+ "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "tokio-sync 0.2.0-alpha.6 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "tokio-sync"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1903,6 +1915,7 @@ dependencies = [
 "checksum tokio-macros 0.2.0-alpha.6 (registry+https://github.com/rust-lang/crates.io-index)" = "86b616374bcdadd95974e1f0dfca07dc913f1163c53840c0d664aca35114964e"
 "checksum tokio-net 0.2.0-alpha.6 (registry+https://github.com/rust-lang/crates.io-index)" = "a441682cd32f3559383112c4a7f372f5c9fa1950c5cf8c8dd05274a2ce8c2654"
 "checksum tokio-postgres 0.4.0-rc.3 (git+https://github.com/sfackler/rust-postgres)" = "<none>"
+"checksum tokio-resource-pool 0.5.0-alpha.1 (git+https://github.com/pimeys/tokio-resource-pool)" = "<none>"
 "checksum tokio-sync 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)" = "d06554cce1ae4a50f42fba8023918afa931413aded705b560e29600ccf7c6d76"
 "checksum tokio-sync 0.2.0-alpha.6 (registry+https://github.com/rust-lang/crates.io-index)" = "4f1aaeb685540f7407ea0e27f1c9757d258c7c6bf4e3eb19da6fc59b747239d2"
 "checksum tokio-timer 0.3.0-alpha.6 (registry+https://github.com/rust-lang/crates.io-index)" = "b97c1587fe71018eb245a4a9daa13a5a3b681bbc1f7fdadfe24720e141472c13"
