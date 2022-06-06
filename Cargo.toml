@@ -9,7 +9,7 @@ edition = "2018"
 [dependencies]
 futures-preview = { version = "=0.3.0-alpha.19", features = ["async-await"] }
 tokio = "=0.2.0-alpha.6"
-rusqlite = { version = "0.19", features = ["chrono", "bundled"] }
+rusqlite = { version = "0.23", features = ["chrono", "bundled"] }
 async-std = "0.99.9"
 tokio-postgres = { git = "https://github.com/sfackler/rust-postgres" }
 mysql_async = { git = "https://github.com/blackbeam/mysql_async" }
