@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 futures-preview = { version = "=0.3.0-alpha.19", features = ["async-await"] }
-tokio = "=0.2.0-alpha.6"
+tokio = "=1.18.5"
 rusqlite = { version = "0.19", features = ["chrono", "bundled"] }
 async-std = "0.99.9"
 tokio-postgres = { git = "https://github.com/sfackler/rust-postgres" }
